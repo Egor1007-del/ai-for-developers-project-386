@@ -1,0 +1,28 @@
+[tools]
+ruby = "4.0.6"
+node = "24.16.0"
+yarn = "1.22.22"
+
+[tasks.setup]
+description = "Установить зависимости и подготовить базу данных"
+run = "bin/setup --skip-server"
+
+[tasks.dev]
+description = "Запустить сервер и сборку стилей"
+run = "bin/dev"
+
+[tasks.test]
+description = "Запустить тесты Minitest"
+run = "bin/rails test"
+
+[tasks.lint]
+description = "Проверить стиль Ruby"
+run = "bin/rubocop"
+
+[tasks.security]
+description = "Проверить приложение с Brakeman"
+run = "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
+
+[tasks.check]
+description = "Выполнить все проверки Rails CI"
+run = "bin/ci"
