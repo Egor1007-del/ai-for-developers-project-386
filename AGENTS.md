@@ -1,8 +1,39 @@
 # Руководство по репозиторию
 
-- Приложение на Rails 8.1 / Ruby 4.0.6 использует SQLite, Slim, Hotwire и importmap. README описывает задуманный сценарий бронирования; сейчас корневой маршрут ведёт только на `home#index`, а `/up` проверяет работоспособность Rails.
-- Версии Ruby, Node и Yarn закреплены в `mise.toml`. Выполните `mise install`, затем `bin/setup --skip-server`: команда установит гемы и зависимости Yarn с фиксированным lockfile и подготовит базу данных.
-- `bin/dev` запускает Rails и отслеживание изменений CSS через Foreman (если Foreman отсутствует, он будет установлен). Редактируйте `app/assets/stylesheets/application.bootstrap.scss`; `yarn build:css` генерирует игнорируемый файл `app/assets/builds/application.css`. JavaScript использует importmap без сборщика.
-- Запускайте Minitest командой `bin/rails test`, отдельный тест — `bin/rails test test/integration/smoke_test.rb:4`. Системные тесты запускаются отдельно: `bin/rails test:system`.
-- `bin/rubocop` проверяет стиль Ruby, а `bin/ci` выполняет последовательность CI: подготовку, RuboCop, аудит гемов и importmap, Brakeman, тесты Rails и затем `RAILS_ENV=test bin/rails db:seed:replant`. Последний шаг сбрасывает тестовую базу данных; системные тесты в эту последовательность не входят.
-- Не редактируйте и не удаляйте `.github/workflows/hexlet-check.yml`: файл генерируется для внешних проверок Хекслета.
+## Архитектура
+
+- **Стек:** Ruby 4.0.6, Rails 8.1.4, SQLite, Slim, Bootstrap 5, Hotwire (Turbo и Stimulus), importmap.
+- **Архитектура:** Rails-монолит с серверной генерацией HTML, без отдельного frontend-приложения.
+- **Текущее состояние:** `home#index` — главная страница; `/up` — проверка работоспособности. Функциональность бронирования пока отсутствует.
+
+## Окружение и команды
+
+Версии Ruby, Node.js и Yarn зафиксированы в `mise.toml`. Для Ruby-команд использовать окружение mise, не смешивая пути gems RVM и mise.
+
+```bash
+mise install
+mise exec -- bin/setup --skip-server
+mise run dev
+mise exec -- bin/rails test
+mise exec -- bin/rails test test/integration/smoke_test.rb
+mise exec -- bin/rails test:system
+mise exec -- bin/rubocop
+mise run check
+```
+
+- `mise run dev` используется, если задача определена в `mise.toml`; иначе — `mise exec -- bin/dev`.
+- `mise run check` запускает `bin/ci`.
+
+## Соглашения
+
+- JavaScript подключен через importmap, без отдельного сборщика JavaScript.
+- Стили Bootstrap редактируются в `app/assets/stylesheets/application.bootstrap.scss`; CSS собирается через Yarn.
+- Коммиты оформлять по **Conventional Commits**: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`. Сообщения должны отражать фактические изменения.
+- Запускать тесты для измененной функциональности. Перед завершением значимого этапа выполнять `mise run check`.
+- **Не изменять и не удалять** `.github/workflows/hexlet-check.yml` — файл предназначен для внешних проверок Хекслета.
+
+## CI
+
+- `mise run check` запускает `bin/ci`: подготовку окружения, RuboCop, аудит gems и importmap, Brakeman, Rails-тесты и проверку seeds.
+- Системные тесты запускаются отдельно.
+- GitHub Actions должен использовать ту же команду `mise run check`.
