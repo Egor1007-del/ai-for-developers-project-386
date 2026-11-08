@@ -18,7 +18,7 @@
 
 ## Стек
 
-- Ruby 4.0.6, Rails 8.1.4, SQLite
+- Ruby 4.0.6, Rails 8.1.4.1, SQLite
 - Slim, Bootstrap, Hotwire (Turbo и Stimulus), importmap
 - Node.js и Yarn для сборки стилей
 

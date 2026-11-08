@@ -2,7 +2,7 @@
 
 ## Архитектура
 
-- **Стек:** Ruby 4.0.6, Rails 8.1.4, SQLite, Slim, Bootstrap 5, Hotwire (Turbo и Stimulus), importmap.
+- **Стек:** Ruby 4.0.6, Rails 8.1.4.1, SQLite, Slim, Bootstrap 5, Hotwire (Turbo и Stimulus), importmap.
 - **Архитектура:** Rails-монолит с серверной генерацией HTML, без отдельного frontend-приложения.
 - **Текущее состояние:** `home#index` — главная страница; `/up` — проверка работоспособности. Функциональность бронирования пока отсутствует.
 
