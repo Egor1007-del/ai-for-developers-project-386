@@ -24,12 +24,13 @@
 
 ## Установка
 
-Необходимы Ruby 4.0.6, Node.js и Yarn.
+Необходим [mise](https://mise.jdx.dev/) для установки Ruby, Node.js, Yarn и hk.
 
 ```bash
 git clone https://github.com/Egor1007-del/ai-for-developers-project-386.git
 cd ai-for-developers-project-386
-bin/setup --skip-server
+mise install
+mise run setup
 ```
 
 ## Использование
@@ -69,6 +70,8 @@ mise run check    # все проверки через bin/ci
 ```
 
 Без mise общую проверку можно запустить командой `bin/ci` после установки зависимостей. Она же выполняется в GitHub Actions при каждом push и pull request.
+
+При `mise run setup` устанавливаются Git-хуки hk: перед коммитом запускается RuboCop, а сообщение проверяется на соответствие Conventional Commits (например, `feat: добавить календарь`). Для повторной установки хуков выполните `mise exec -- hk install --mise`.
 
 ---
 

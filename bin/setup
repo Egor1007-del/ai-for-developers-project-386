@@ -16,6 +16,9 @@ FileUtils.chdir APP_ROOT do
   system("bundle check") || system!("bundle install")
   system! "yarn install --frozen-lockfile"
 
+  puts "\n== Installing Git hooks =="
+  system! "mise", "exec", "--", "hk", "install", "--mise"
+
   # puts "\n== Copying sample files =="
   # unless File.exist?("config/database.yml")
   #   FileUtils.cp "config/database.yml.sample", "config/database.yml"
