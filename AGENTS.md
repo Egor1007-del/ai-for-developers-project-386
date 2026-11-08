@@ -37,3 +37,17 @@ mise run check
 - `mise run check` запускает `bin/ci`: подготовку окружения, RuboCop, аудит gems и importmap, Brakeman, Rails-тесты и проверку seeds.
 - Системные тесты запускаются отдельно.
 - GitHub Actions должен использовать ту же команду `mise run check`.
+
+## Agent skills
+
+### Issue tracker
+
+Задачи ведутся в GitHub Issues репозитория. См. `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Используются стандартные метки triage. См. `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Проект использует единый доменный контекст. См. `docs/agents/domain.md`.
