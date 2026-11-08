@@ -2,6 +2,17 @@
 ruby = "4.0.6"
 node = "24.16.0"
 yarn = "1.22.22"
+pitchfork = "2.33.1"
+
+[settings]
+experimental = true
+
+[daemons.web]
+run = "exec env RUBY_DEBUG_OPEN=true bin/rails server"
+ready_port = 3000
+
+[daemons.css]
+run = "exec yarn watch:css"
 
 [hooks]
 enter = "echo 'Вход в проект Календарь'"
