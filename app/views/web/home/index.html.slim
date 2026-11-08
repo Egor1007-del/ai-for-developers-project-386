@@ -1,0 +1,18 @@
+main.bg-primary-subtle.bg-gradient.min-vh-100
+  .container.py-5
+    .row.g-4.g-lg-5
+      section.col-md-6
+        span.badge.rounded-pill.text-bg-light.text-secondary.text-uppercase Быстрая запись на звонок
+        h1.display-5.fw-bold.my-3 Calendar
+        p.lead.text-secondary Забронируйте встречу за минуту: выберите тип события и удобное время.
+        = link_to booking_path, class: "btn btn-warning fw-bold px-4 py-2 mt-2" do
+          | Записаться
+          i.bi.bi-arrow-right.ms-2[aria-hidden="true"]
+      section.col-md-6[aria-labelledby="features-title"]
+        .card.shadow-sm.rounded-4
+          .card-body.p-4
+            h2#features-title.h5.fw-bold.mb-3 Возможности
+            ul.text-secondary.small.mb-0.ps-3
+              li.mb-2 Выбор типа события и удобного времени для встречи.
+              li.mb-2 Быстрое бронирование с подтверждением и дополнительными заметками.
+              li Управление типами встреч и просмотр предстоящих записей в админке.

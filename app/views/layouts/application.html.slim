@@ -1,11 +1,11 @@
 doctype html
-html
+html[lang="ru"]
   head
     title
-      = content_for(:title) || "Calendar Calls"
+      = content_for(:title) || "Calendar"
     meta[name="viewport" content="width=device-width,initial-scale=1"]
     meta[name="apple-mobile-web-app-capable" content="yes"]
-    meta[name="application-name" content="Calendar Calls"]
+    meta[name="application-name" content="Calendar"]
     meta[name="mobile-web-app-capable" content="yes"]
     = csrf_meta_tags
     = csp_meta_tag
@@ -18,5 +18,13 @@ html
     - # Includes all stylesheet files in app/assets/stylesheets
     = stylesheet_link_tag :app, "data-turbo-track": "reload"
     = javascript_importmap_tags
-  body
+  body.bg-body-tertiary.text-dark
+    header.bg-light.border-bottom
+      nav.container.d-flex.align-items-center.justify-content-between.py-3[aria-label="Основная навигация"]
+        = link_to root_path, class: "d-inline-flex align-items-center gap-2 fw-bold text-dark text-decoration-none" do
+          i.bi.bi-calendar2-event.text-warning[aria-hidden="true"]
+          span Calendar
+        .d-flex.gap-3.gap-md-4
+          = link_to "Записаться", booking_path, class: "text-secondary text-decoration-none small"
+          = link_to "Админка", admin_path, class: "text-secondary text-decoration-none small"
     = yield
