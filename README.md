@@ -35,7 +35,7 @@ bin/setup --skip-server
 ## Использование
 
 ```bash
-bin/dev
+mise run dev
 ```
 
 Откройте http://localhost:3000. Пока доступен только каркас приложения.
