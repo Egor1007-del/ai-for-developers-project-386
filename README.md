@@ -19,8 +19,8 @@
 ## Стек
 
 - Ruby 4.0.6, Rails 8.1.4.1, SQLite
-- Slim, Bootstrap, Hotwire (Turbo и Stimulus), importmap
-- Node.js и Yarn для сборки стилей
+- Slim, Bootstrap, Hotwire (Turbo и Stimulus), esbuild
+- Node.js и Yarn для сборки JavaScript, TypeScript и стилей
 
 ## Установка
 
@@ -45,10 +45,10 @@ mise run dev
 
 ### Фоновый запуск через mise daemons
 
-Альтернативный способ запуска сервера и сборки стилей — фоновые процессы под управлением pitchfork. Поддержка daemons в mise является экспериментальной; она включена в конфигурации проекта. При первом запуске mise установит закреплённую версию pitchfork, если она ещё не установлена.
+Альтернативный способ запуска сервера и сборки JavaScript и стилей — фоновые процессы под управлением pitchfork. Поддержка daemons в mise является экспериментальной; она включена в конфигурации проекта. При первом запуске mise установит закреплённую версию pitchfork, если она ещё не установлена.
 
 ```bash
-mise daemons start   # запустить web и css
+mise daemons start   # запустить web, js и css
 mise daemons status  # проверить состояние
 mise daemons logs    # посмотреть вывод процессов
 mise daemons stop    # остановить процессы
@@ -62,7 +62,7 @@ mise daemons stop    # остановить процессы
 
 ```bash
 mise run setup    # зависимости и база данных
-mise run dev      # сервер и сборка стилей
+mise run dev      # сервер и сборка JavaScript и стилей
 mise run test     # Minitest
 mise run lint     # RuboCop
 mise run security # Brakeman
@@ -70,6 +70,8 @@ mise run check    # все проверки через bin/ci
 ```
 
 Без mise общую проверку можно запустить командой `bin/ci` после установки зависимостей. Она же выполняется в GitHub Actions при каждом push и pull request.
+
+JavaScript собирается командой `mise exec -- yarn build`, а TypeScript проверяется командой `mise exec -- yarn typecheck`. Новые Stimulus-контроллеры нужно импортировать и регистрировать в `app/javascript/controllers/index.js`. Rails автоматически собирает ассеты при запуске тестов и `assets:precompile`.
 
 При `mise run setup` устанавливаются Git-хуки hk: перед коммитом запускается RuboCop, а сообщение проверяется на соответствие Conventional Commits (например, `feat: добавить календарь`). Для повторной установки хуков выполните `mise exec -- hk install --mise`.
 

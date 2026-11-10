@@ -9,6 +9,7 @@ class SmokeTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", booking_path, text: /Записаться/, count: 2
     assert_select "a[href=?]", admin_path, text: "Админка"
     assert_select "link[rel=stylesheet][href*='application']"
+    assert_select "script[type=module][src*='application'][data-turbo-track=reload]"
 
     get rails_health_check_path
     assert_response :success

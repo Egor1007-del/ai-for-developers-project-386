@@ -2,7 +2,7 @@
 
 ## Архитектура
 
-- **Стек:** Ruby 4.0.6, Rails 8.1.4.1, SQLite, Slim, Bootstrap 5, Hotwire (Turbo и Stimulus), importmap.
+- **Стек:** Ruby 4.0.6, Rails 8.1.4.1, SQLite, Slim, Bootstrap 5, Hotwire (Turbo и Stimulus), esbuild.
 - **Архитектура:** Rails-монолит с серверной генерацией HTML, без отдельного frontend-приложения.
 - **Текущее состояние:** `home#index` — главная страница; `/up` — проверка работоспособности. Функциональность бронирования пока отсутствует.
 
@@ -26,7 +26,7 @@ mise run check
 
 ## Соглашения
 
-- JavaScript подключен через importmap, без отдельного сборщика JavaScript.
+- JavaScript и TypeScript собираются через esbuild (jsbundling-rails); контроллеры Stimulus регистрируются в `app/javascript/controllers/index.js`.
 - Стили Bootstrap редактируются в `app/assets/stylesheets/application.bootstrap.scss`; CSS собирается через Yarn.
 - Коммиты оформлять по **Conventional Commits**: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`. Сообщения должны отражать фактические изменения.
 - Запускать тесты для измененной функциональности. Перед завершением значимого этапа выполнять `mise run check`.
@@ -34,7 +34,7 @@ mise run check
 
 ## CI
 
-- `mise run check` запускает `bin/ci`: подготовку окружения, RuboCop, аудит gems и importmap, Brakeman, Rails-тесты и проверку seeds.
+- `mise run check` запускает `bin/ci`: подготовку окружения, RuboCop, проверку типов TypeScript, аудит gems, Brakeman, Rails-тесты и проверку seeds.
 - Системные тесты запускаются отдельно.
 - GitHub Actions должен использовать ту же команду `mise run check`.
 

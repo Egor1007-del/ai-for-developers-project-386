@@ -16,6 +16,9 @@ ready_port = 3000
 [daemons.css]
 run = "exec yarn watch:css"
 
+[daemons.js]
+run = "exec yarn watch:js"
+
 [hooks]
 enter = "echo 'Вход в проект Календарь'"
 
@@ -24,7 +27,7 @@ description = "Установить зависимости и подготови
 run = "bin/setup --skip-server"
 
 [tasks.dev]
-description = "Запустить сервер и сборку стилей"
+description = "Запустить сервер и сборку JavaScript и стилей"
 run = "bin/dev"
 
 [tasks.test]
