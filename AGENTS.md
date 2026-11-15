@@ -29,6 +29,7 @@ mise run check
 - JavaScript и TypeScript собираются через esbuild (jsbundling-rails); контроллеры Stimulus регистрируются в `app/javascript/controllers/index.js`.
 - Стили Bootstrap редактируются в `app/assets/stylesheets/application.bootstrap.scss`; CSS собирается через Yarn.
 - Коммиты оформлять по **Conventional Commits**: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`. Сообщения должны отражать фактические изменения.
+- Коммит реализации ссылается на тикет, который он закрывает, См. `docs/agents/issue-tracker.md`
 - Запускать тесты для измененной функциональности. Перед завершением значимого этапа выполнять `mise run check`.
 - **Не изменять и не удалять** `.github/workflows/hexlet-check.yml` — файл предназначен для внешних проверок Хекслета.
 
