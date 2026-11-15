@@ -102,6 +102,7 @@ export class DefaultService {
                 404: `event_type_not_found: the event type does not exist`,
                 422: `validation_error for invalid or missing fields; invalid_start_time for a time outside the booking rules`,
                 500: `internal_error: unexpected server error without technical details`,
+                503: `service_unavailable: database lock wait exhausted`,
             },
         });
     }

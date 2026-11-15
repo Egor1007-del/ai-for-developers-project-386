@@ -54,7 +54,7 @@ interface EventTypes {
   @post @operationId("createEventType")
   create(@body body: EventTypeInput): Created<EventType> | BadRequest | Unprocessable | InternalError;
   @get @route("/{id}/availability") @operationId("getAvailability")
-  availability(@path id: int32): Ok<Availability> | NotFound | Unprocessable | InternalError;
+  availability(@path id: int32): Ok<Availability> | NotFound | Unprocessable | Unavailable | InternalError;
 }
 
 @route("/api/bookings")

@@ -1,5 +1,4 @@
-class Api::EventTypesController < ApplicationController
-  wrap_parameters false
+class Api::EventTypesController < Api::BaseController
   rescue_from StandardError, with: :internal_error
   rescue_from ActionDispatch::Http::Parameters::ParseError, ActionController::BadRequest, with: :invalid_json
 
@@ -29,11 +28,21 @@ class Api::EventTypesController < ApplicationController
     end
   end
 
-  private
+  def availability
+    unless params[:id].match?(/\A[1-9]\d*\z/)
+      return error("validation_error", "Некорректный ID типа события", :unprocessable_entity)
+    end
+    event_type = EventType.find_by(id: params[:id])
+    return error("event_type_not_found", "Тип события не найден", :not_found) unless event_type
 
-  def invalid_json(_error)
-    render json: { error: { code: "invalid_json", message: "Некорректный JSON" } }, status: :bad_request
+    render json: { time_zone: "Europe/Moscow", days: Availability.new(event_type).days }
+  rescue StandardError => error
+    raise unless database_busy?(error)
+
+    service_unavailable
   end
+
+  private
 
   def internal_error(error)
     Rails.logger.error("Event type could not be created: #{error.full_message}")

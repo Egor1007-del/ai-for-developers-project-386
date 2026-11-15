@@ -6,9 +6,18 @@ main.container.py-5[data-controller="event-types"]
           span.badge.text-bg-primary.mb-3 Календарь владельца
           h1.h2.fw-bold Boss
           p.text-secondary.mb-0 Выберите тип звонка, чтобы записаться на встречу.
-      h2.h4.fw-bold.mb-3 Типы событий
-      p.text-secondary[role="status" data-event-types-target="status"] Загрузка типов событий…
-      = link_to "Создать тип события", admin_path, class: "btn btn-outline-primary mb-3 d-none", data: { event_types_target: "create" }
-      button.btn.btn-outline-primary.mb-3.d-none[type="button" data-event-types-target="retry" data-action="event-types#load"] Повторить
-      .row.g-3[data-event-types-target="list"]
+      fieldset[data-event-types-target="controls"]
+       h2.h4.fw-bold.mb-3 Типы событий
+       p.text-secondary[role="status" data-event-types-target="status"] Загрузка типов событий…
+       = link_to "Создать тип события", admin_path, class: "btn btn-outline-primary mb-3 d-none", data: { event_types_target: "create" }
+       button.btn.btn-outline-primary.mb-3.d-none[type="button" data-event-types-target="retry" data-action="event-types#load"] Повторить
+       .row.g-3[data-event-types-target="list"]
+       section.mt-4.d-none[data-event-types-target="booking"]
+         h2.h4.fw-bold[data-event-types-target="heading"]
+         p.text-secondary[role="status" data-event-types-target="bookingStatus"]
+         button.btn.btn-outline-primary.mb-3.d-none[type="button" data-event-types-target="bookingRetry" data-action="event-types#retryAvailability"] Обновить доступность
+         .d-flex.flex-wrap.gap-2.mb-3[aria-label="Даты" data-event-types-target="days"]
+         .d-flex.flex-wrap.gap-2.mb-3[aria-label="Время" data-event-types-target="slots"]
+         p[data-event-types-target="selection"]
+         button.btn.btn-primary.d-none[type="button" data-event-types-target="confirm" data-action="event-types#confirm"] Подтвердить запись
       = link_to "На главную", root_path, class: "d-inline-block mt-4"

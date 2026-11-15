@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   namespace :api do
-    resources :event_types, only: %i[index create]
+    resources :event_types, only: %i[index create] do
+      get :availability, on: :member
+    end
+    resources :bookings, only: :create
   end
 
   scope module: :web do

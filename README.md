@@ -25,6 +25,7 @@
 ## Установка
 
 Необходим [mise](https://mise.jdx.dev/) для установки Ruby, Node.js, Yarn и hk.
+Также установите утилиту командной строки `sqlite3`: Rails использует её для загрузки и сохранения SQL-схемы базы данных (например, `sudo apt install sqlite3` в Debian/Ubuntu).
 
 ```bash
 git clone https://github.com/Egor1007-del/ai-for-developers-project-386.git

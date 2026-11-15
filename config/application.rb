@@ -11,6 +11,7 @@ module CalendarCalls
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
     config.generators.template_engine = :slim
+    config.active_record.schema_format = :sql
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
