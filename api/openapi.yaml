@@ -230,11 +230,16 @@ components:
       required:
         - date
         - slots
+        - busy_slots
       properties:
         date:
           type: string
           format: date
         slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slot'
+        busy_slots:
           type: array
           items:
             $ref: '#/components/schemas/Slot'

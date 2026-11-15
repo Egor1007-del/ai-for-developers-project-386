@@ -21,16 +21,36 @@ class BookingsSystemTest < ApplicationSystemTestCase
     JS
     click_button "Подтвердить запись"
     assert_text "Создание записи…"
-    assert page.evaluate_script("Array.from(document.querySelectorAll('button')).find(button => button.textContent === 'Выбрать Второй').matches(':disabled')")
+    assert_button "Назад", disabled: true
     assert_selector '[aria-label="Даты"] button:disabled', minimum: 1
     assert_selector '[aria-label="Время"] button:disabled', minimum: 1
     assert page.evaluate_script("document.querySelector('[data-event-types-target=confirm]').matches(':disabled')")
     assert_text selection
     page.execute_script "window.releaseBooking()"
     assert_text "Запись создана:"
-    assert_text "Выберите дату и время: Первый"
-    assert_button "Выбрать Второй", disabled: false
+    assert_text "Первый"
+    assert_button "Назад", disabled: false
     assert_equal 1, Booking.count
+  end
+
+  test "calendar displays occupied slots and permits selecting adjacent free slots" do
+    type = EventType.create!(name: "Звонок", description: "Описание", duration_minutes: 15)
+    date = Time.current.in_time_zone("Europe/Moscow").to_date + 1
+    start = Time.find_zone!("Europe/Moscow").local(date.year, date.month, date.day, 10)
+    Booking.create!(event_type: type, starts_at: start, ends_at: start + 15.minutes)
+    visit booking_path
+    click_button "Выбрать Звонок"
+    assert_text "Выберите дату (московское время)"
+    if date.strftime("%Y-%m") != Time.current.in_time_zone("Europe/Moscow").strftime("%Y-%m")
+      click_button "Следующий месяц"
+    end
+    find("[aria-label='Даты'] button[aria-label='#{date.iso8601}']").click
+    within '[aria-label="Время"]' do
+      assert_button "10:00 - 10:15 Занято", disabled: true
+      assert_button "10:15 - 10:30 Свободно", disabled: false
+      click_button "10:15 - 10:30 Свободно"
+    end
+    assert_text "Выбрано: #{date.iso8601}, 10:15"
   end
 
   test "guest selects and confirms a free slot" do

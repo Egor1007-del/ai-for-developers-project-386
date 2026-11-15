@@ -22,7 +22,7 @@ model EventTypeInput {
 }
 
 model Slot { starts_at: offsetDateTime; ends_at: offsetDateTime; }
-model Day { date: plainDate; slots: Slot[]; }
+model Day { date: plainDate; slots: Slot[]; busy_slots: Slot[]; }
 model Availability { time_zone: string; days: Day[]; }
 model Booking { id: int32; event_type: EventType; starts_at: offsetDateTime; ends_at: offsetDateTime; }
 model BookingInput { event_type_id: int32; starts_at: offsetDateTime; }

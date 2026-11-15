@@ -1,23 +1,50 @@
-main.container.py-5[data-controller="event-types"]
-  .row.justify-content-center
-    .col-lg-8
-      .card.border-0.shadow-sm.rounded-4.mb-4
-        .card-body.p-4
-          span.badge.text-bg-primary.mb-3 Календарь владельца
-          h1.h2.fw-bold Boss
-          p.text-secondary.mb-0 Выберите тип звонка, чтобы записаться на встречу.
-      fieldset[data-event-types-target="controls"]
-       h2.h4.fw-bold.mb-3 Типы событий
-       p.text-secondary[role="status" data-event-types-target="status"] Загрузка типов событий…
-       = link_to "Создать тип события", admin_path, class: "btn btn-outline-primary mb-3 d-none", data: { event_types_target: "create" }
-       button.btn.btn-outline-primary.mb-3.d-none[type="button" data-event-types-target="retry" data-action="event-types#load"] Повторить
-       .row.g-3[data-event-types-target="list"]
-       section.mt-4.d-none[data-event-types-target="booking"]
-         h2.h4.fw-bold[data-event-types-target="heading"]
-         p.text-secondary[role="status" data-event-types-target="bookingStatus"]
-         button.btn.btn-outline-primary.mb-3.d-none[type="button" data-event-types-target="bookingRetry" data-action="event-types#retryAvailability"] Обновить доступность
-         .d-flex.flex-wrap.gap-2.mb-3[aria-label="Даты" data-event-types-target="days"]
-         .d-flex.flex-wrap.gap-2.mb-3[aria-label="Время" data-event-types-target="slots"]
-         p[data-event-types-target="selection"]
-         button.btn.btn-primary.d-none[type="button" data-event-types-target="confirm" data-action="event-types#confirm"] Подтвердить запись
-      = link_to "На главную", root_path, class: "d-inline-block mt-4"
+main.container.py-5.booking-page[data-controller="event-types"]
+  fieldset[data-event-types-target="controls"]
+    section[data-event-types-target="types"]
+      h1.h2.fw-bold Boss
+      p.text-secondary Выберите тип звонка, чтобы записаться на встречу.
+      h2.h4.fw-bold.mb-3 Типы событий
+      p.text-secondary[role="status" data-event-types-target="status"] Загрузка типов событий…
+      = link_to "Создать тип события", admin_path, class: "btn btn-outline-primary mb-3 d-none", data: { event_types_target: "create" }
+      button.btn.btn-outline-primary.mb-3.d-none[type="button" data-event-types-target="retry" data-action="event-types#load"] Повторить
+      .row.g-3[data-event-types-target="list"]
+    section.d-none[data-event-types-target="booking"]
+      h1.h2.fw-bold.mb-4[data-event-types-target="heading"]
+      p.text-secondary[role="status" data-event-types-target="bookingStatus"]
+      button.btn.btn-outline-secondary.mb-3.d-none[type="button" data-event-types-target="bookingRetry" data-action="event-types#retryAvailability"] Обновить доступность
+      .booking-layout
+        article.booking-panel
+          .d-flex.align-items-center.gap-3.mb-4
+            .booking-avatar[aria-hidden="true"] B
+            div
+              strong Boss
+              div.small.text-secondary Организатор
+          .d-flex.justify-content-between.align-items-start.gap-2
+            h2.h5.fw-bold[data-event-types-target="eventName"]
+            span.badge.text-bg-light[data-event-types-target="duration"]
+          p.small[data-event-types-target="description"]
+          .booking-summary
+            span.text-secondary.small Выбранная дата
+            div[data-event-types-target="selectedDate"] Дата не выбрана
+          .booking-summary
+            span.text-secondary.small Выбранное время
+            div[data-event-types-target="selection"] Время не выбрано
+        article.booking-panel
+          .d-flex.justify-content-between.align-items-center.mb-3
+            h2.h5.fw-bold.mb-0 Календарь
+            .d-flex.gap-2
+              button.btn.btn-sm.btn-outline-secondary[type="button" aria-label="Предыдущий месяц" data-action="event-types#previousMonth" data-event-types-target="previous"] ←
+              button.btn.btn-sm.btn-outline-secondary[type="button" aria-label="Следующий месяц" data-action="event-types#nextMonth" data-event-types-target="next"] →
+          p.small.fw-semibold[data-event-types-target="month"]
+          .booking-weekdays[aria-hidden="true"]
+            - %w[Пн Вт Ср Чт Пт Сб Вс].each do |day|
+              span = day
+          .booking-calendar[aria-label="Даты" data-event-types-target="days"]
+        article.booking-panel.booking-slots-panel
+          h2.h5.fw-bold.mb-3 Статус слотов
+          .booking-slots[aria-label="Время" data-event-types-target="slots"]
+            p.text-secondary.small Выберите дату в календаре.
+          .d-flex.gap-2.mt-3
+            button.btn.btn-outline-secondary.flex-fill[type="button" data-action="event-types#back"] Назад
+            button.btn.booking-confirm.flex-fill.d-none[type="button" data-event-types-target="confirm" data-action="event-types#confirm"] Подтвердить запись
+  = link_to "На главную", root_path, class: "d-inline-block mt-4"

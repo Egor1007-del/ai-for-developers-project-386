@@ -83,6 +83,14 @@ class BookingsTest < ActionDispatch::IntegrationTest
       assert_not_includes slots, "2026-11-15T10:00:00+03:00"
       assert_not_includes slots, "2026-11-15T10:15:00+03:00"
       assert_includes slots, "2026-11-15T10:30:00+03:00"
+      busy = response.parsed_body.fetch("days").first.fetch("busy_slots").pluck("starts_at")
+      assert_includes busy, "2026-11-15T10:00:00+03:00"
+      assert_includes busy, "2026-11-15T10:15:00+03:00"
+      assert_not_includes busy, "2026-11-15T10:30:00+03:00"
+      get "/api/event_types/#{long.id}/availability"
+      busy = response.parsed_body.fetch("days").first.fetch("busy_slots").pluck("starts_at")
+      assert_includes busy, "2026-11-15T09:45:00+03:00"
+      assert_not_includes busy, "2026-11-15T10:30:00+03:00"
     end
   end
 

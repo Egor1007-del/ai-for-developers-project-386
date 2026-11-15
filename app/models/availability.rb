@@ -16,15 +16,20 @@ class Availability
     occupied = Booking.where("starts_at < ? AND ends_at > ?", ZONE.local(last.year, last.month, last.day), @now).pluck(:starts_at, :ends_at)
     DAYS.times.map do |offset|
       date = first + offset
-      slots = ((CLOSING_HOUR - OPENING_HOUR) * 60 / STEP.in_minutes).to_i.times.filter_map do |index|
+      slots = []
+      busy_slots = []
+      ((CLOSING_HOUR - OPENING_HOUR) * 60 / STEP.in_minutes).to_i.times do |index|
         starts_at = ZONE.local(date.year, date.month, date.day, OPENING_HOUR) + index * STEP
         ends_at = ends_at_for(starts_at)
         next unless valid_start?(starts_at)
-        next if occupied.any? { |start_time, end_time| start_time < ends_at && end_time > starts_at }
-
-        { starts_at: starts_at.iso8601, ends_at: ends_at.iso8601 }
+        slot = { starts_at: starts_at.iso8601, ends_at: ends_at.iso8601 }
+        if occupied.any? { |start_time, end_time| start_time < ends_at && end_time > starts_at }
+          busy_slots << slot
+        else
+          slots << slot
+        end
       end
-      { date: date.iso8601, slots: slots }
+      { date: date.iso8601, slots: slots, busy_slots: busy_slots }
     end
   end
 

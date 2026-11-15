@@ -3,7 +3,15 @@ import { ApiError, DefaultService, OpenAPI } from "../generated"
 import type { Day, EventType, Slot } from "../generated"
 
 export default class extends Controller {
-  static targets = ["status", "list", "retry", "create", "booking", "heading", "bookingStatus", "bookingRetry", "days", "slots", "selection", "confirm", "controls"]
+  static targets = ["status", "list", "retry", "create", "types", "booking", "heading", "eventName", "description", "duration", "selectedDate", "month", "previous", "next", "bookingStatus", "bookingRetry", "days", "slots", "selection", "confirm", "controls"]
+  declare readonly typesTarget: HTMLElement
+  declare readonly eventNameTarget: HTMLElement
+  declare readonly descriptionTarget: HTMLElement
+  declare readonly durationTarget: HTMLElement
+  declare readonly selectedDateTarget: HTMLElement
+  declare readonly monthTarget: HTMLElement
+  declare readonly previousTarget: HTMLButtonElement
+  declare readonly nextTarget: HTMLButtonElement
   declare readonly controlsTarget: HTMLFieldSetElement
   declare readonly statusTarget: HTMLElement
   declare readonly listTarget: HTMLElement
@@ -21,6 +29,9 @@ export default class extends Controller {
   private selectedSlot?: Slot
   private requestVersion = 0
   private submitting = false
+  private availability: Day[] = []
+  private month = ""
+  private selectedDay?: Day
 
   connect() {
     this.load()
@@ -64,7 +75,11 @@ export default class extends Controller {
     choose.textContent = `Выбрать ${eventType.name}`
     choose.addEventListener("click", () => {
       this.selectedType = eventType
-      this.headingTarget.textContent = `Выберите дату и время: ${eventType.name}`
+      this.headingTarget.textContent = eventType.name
+      this.eventNameTarget.textContent = eventType.name
+      this.descriptionTarget.textContent = eventType.description
+      this.durationTarget.textContent = `${eventType.duration_minutes} мин`
+      this.typesTarget.classList.add("d-none")
       this.bookingTarget.classList.remove("d-none")
       this.loadAvailability()
     })
@@ -79,7 +94,9 @@ export default class extends Controller {
     const version = ++this.requestVersion
     this.selectedSlot = undefined
     this.confirmTarget.classList.add("d-none")
-    this.selectionTarget.textContent = ""
+    this.selectionTarget.textContent = "Время не выбрано"
+    this.selectedDateTarget.textContent = "Дата не выбрана"
+    this.selectedDay = undefined
     this.daysTarget.replaceChildren()
     this.slotsTarget.replaceChildren()
     this.bookingRetryTarget.classList.add("d-none")
@@ -88,7 +105,9 @@ export default class extends Controller {
       const availability = await DefaultService.getAvailability(this.selectedType.id)
       if (version !== this.requestVersion) return
       this.bookingStatusTarget.textContent = message || "Выберите дату (московское время)"
-      availability.days.forEach((day) => this.renderDay(day))
+      this.availability = availability.days
+      this.month = availability.days[0]?.date.slice(0, 7) ?? ""
+      this.renderCalendar()
     } catch {
       if (version !== this.requestVersion) return
       this.bookingStatusTarget.textContent = message ? `${message} Не удалось обновить доступность.` : "Не удалось загрузить доступность. Попробуйте ещё раз."
@@ -100,25 +119,82 @@ export default class extends Controller {
     this.loadAvailability()
   }
 
-  renderDay(day: Day) {
+  back() {
+    ++this.requestVersion
+    this.bookingTarget.classList.add("d-none")
+    this.typesTarget.classList.remove("d-none")
+  }
+
+  previousMonth() { this.changeMonth(-1) }
+  nextMonth() { this.changeMonth(1) }
+
+  changeMonth(direction: number) {
+    const date = new Date(`${this.month}-01T00:00:00Z`)
+    date.setUTCMonth(date.getUTCMonth() + direction)
+    this.month = date.toISOString().slice(0, 7)
+    this.renderCalendar()
+  }
+
+  renderCalendar() {
+    if (!this.month) return
+    const date = new Date(`${this.month}-01T00:00:00Z`)
+    this.monthTarget.textContent = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric", timeZone: "UTC" }).format(date)
+    const months = this.availability.map((day) => day.date.slice(0, 7))
+    this.previousTarget.disabled = this.month <= months[0]
+    this.nextTarget.disabled = this.month >= months[months.length - 1]
+    this.daysTarget.replaceChildren()
+    const offset = (date.getUTCDay() + 6) % 7
+    for (let i = 0; i < offset; i++) this.daysTarget.append(document.createElement("span"))
+    const year = date.getUTCFullYear()
+    const month = date.getUTCMonth()
+    const count = new Date(Date.UTC(year, month + 1, 0)).getUTCDate()
+    for (let i = 1; i <= count; i++) {
+      const key = `${this.month}-${String(i).padStart(2, "0")}`
+      this.renderDay(key, this.availability.find((day) => day.date === key))
+    }
+  }
+
+  renderDay(date: string, day?: Day) {
     const button = document.createElement("button")
     button.type = "button"
-    button.className = "btn btn-outline-secondary"
-    button.textContent = day.date
-    button.disabled = day.slots.length === 0
+    button.className = "booking-day"
+    button.setAttribute("aria-label", date)
+    button.textContent = String(Number(date.slice(8)))
+    button.disabled = !day || day.slots.length === 0
+    if (day?.slots.length) {
+      const count = document.createElement("small")
+      count.textContent = `${day.slots.length} св.`
+      button.append(count)
+    }
+    if (this.selectedDay?.date === date) button.classList.add("is-selected")
     button.addEventListener("click", () => {
+      if (!day) return
+      this.selectedDay = day
+      this.selectedDateTarget.textContent = new Intl.DateTimeFormat("ru-RU", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${day.date}T00:00:00Z`))
       this.selectedSlot = undefined
-      this.selectionTarget.textContent = ""
+      this.selectionTarget.textContent = "Время не выбрано"
       this.confirmTarget.classList.add("d-none")
       this.slotsTarget.replaceChildren()
-      day.slots.forEach((slot) => {
+      this.renderCalendar()
+      const slots = [...day.slots.map((slot) => ({ slot, busy: false })), ...day.busy_slots.map((slot) => ({ slot, busy: true }))]
+      slots.sort((a, b) => a.slot.starts_at.localeCompare(b.slot.starts_at))
+      slots.forEach(({ slot, busy }) => {
         const time = document.createElement("button")
         time.type = "button"
-        time.className = "btn btn-outline-primary"
-        time.textContent = new Intl.DateTimeFormat("ru-RU", { timeZone: "Europe/Moscow", hour: "2-digit", minute: "2-digit" }).format(new Date(slot.starts_at))
+        time.className = "booking-slot"
+        time.disabled = busy
+        const format = (value: string) => new Intl.DateTimeFormat("ru-RU", { timeZone: "Europe/Moscow", hour: "2-digit", minute: "2-digit" }).format(new Date(value))
+        const label = `${format(slot.starts_at)} - ${format(slot.ends_at)}`
+        const text = document.createElement("span")
+        text.textContent = `${label} `
+        const status = document.createElement("strong")
+        status.textContent = busy ? "Занято" : "Свободно"
+        time.append(text, status)
         time.addEventListener("click", () => {
           this.selectedSlot = slot
-          this.selectionTarget.textContent = `Выбрано: ${day.date}, ${time.textContent} (Москва)`
+          this.slotsTarget.querySelectorAll(".is-selected").forEach((element) => element.classList.remove("is-selected"))
+          time.classList.add("is-selected")
+          this.selectionTarget.textContent = `Выбрано: ${day.date}, ${format(slot.starts_at)} (Москва)`
           this.confirmTarget.classList.remove("d-none")
         })
         this.slotsTarget.append(time)

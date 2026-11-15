@@ -1,2 +1,21 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
+
+.booking-page { max-width: 1050px; }
+.booking-layout { display: grid; grid-template-columns: 1fr 1.45fr 1.1fr; gap: 22px; }
+.booking-panel { background: #fff; border: 1px solid #dfe3e9; border-radius: 16px; padding: 22px; min-width: 0; box-shadow: 0 1px 2px #14213d0a; }
+.booking-avatar { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; background: #ffdfc9; color: #a74b16; font-weight: bold; }
+.booking-summary { background: #edf2f8; border-radius: 10px; padding: 10px 12px; margin-top: 10px; font-size: .875rem; }
+.booking-weekdays, .booking-calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.booking-weekdays { text-align: center; color: #718096; font-size: .75rem; font-weight: 600; margin-bottom: 8px; }
+.booking-day { min-height: 50px; background: #fff; border: 1px solid #e3e8ee; border-radius: 7px; color: #26354a; font-size: .8rem; padding: 2px; }
+.booking-day small { display: block; color: #718096; font-size: .65rem; }
+.booking-day:disabled { background: #f0f3f7; color: #9aa8b8; }
+.booking-day.is-selected, .booking-slot.is-selected { border-color: #fb9c64; background: #fff2e9; }
+.booking-slots { max-height: 330px; overflow-y: auto; display: grid; gap: 7px; }
+.booking-slot { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; padding: 10px; background: white; border: 1px solid #e3e8ee; border-radius: 10px; font-size: .8rem; text-align: left; }
+.booking-slot:disabled { background: #f0f3f7; color: #718096; }
+.booking-confirm { background: #ffae7f; border-color: #ffae7f; color: #fff; font-weight: 600; }
+.booking-confirm:hover { background: #f28f58; color: #fff; }
+@media (max-width: 991px) { .booking-layout { grid-template-columns: 1fr 1fr; } .booking-slots-panel { grid-column: 1 / -1; } }
+@media (max-width: 575px) { .booking-layout { grid-template-columns: 1fr; } .booking-slots-panel { grid-column: auto; } }

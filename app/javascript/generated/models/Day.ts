@@ -6,5 +6,6 @@ import type { Slot } from './Slot';
 export type Day = {
     date: string;
     slots: Array<Slot>;
+    busy_slots: Array<Slot>;
 };
 
