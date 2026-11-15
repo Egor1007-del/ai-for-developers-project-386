@@ -60,6 +60,20 @@ class BookingsTest < ActionDispatch::IntegrationTest
       assert_response :created
     end
   end
+  test "rejects a different type contained in an existing hour-long booking" do
+    existing_type = EventType.create!(name: "Существующий", description: "Описание", duration_minutes: 30)
+    new_type = EventType.create!(name: "Новый", description: "Описание", duration_minutes: 30)
+    travel_to Time.utc(2026, 11, 15, 6) do
+      Booking.create!(event_type: existing_type, starts_at: Time.iso8601("2026-11-15T10:00:00+03:00"), ends_at: Time.iso8601("2026-11-15T11:00:00+03:00"))
+
+      assert_no_difference "Booking.count" do
+        post "/api/bookings", params: { event_type_id: new_type.id, starts_at: "2026-11-15T10:30:00+03:00" }, as: :json
+        assert_response :conflict
+        assert_equal "booking_conflict", response.parsed_body.dig("error", "code")
+      end
+    end
+  end
+
   test "availability includes fourteen Moscow days and excludes past and late slots" do
     event_type = EventType.create!(name: "Звонок", description: "Описание", duration_minutes: 30)
     travel_to Time.utc(2026, 11, 15, 6, 0) do
