@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   namespace :api do
-    resources :event_types, only: :index
+    resources :event_types, only: %i[index create]
   end
 
   scope module: :web do

@@ -8,6 +8,7 @@ main.container.py-5[data-controller="event-types"]
           p.text-secondary.mb-0 Выберите тип звонка, чтобы записаться на встречу.
       h2.h4.fw-bold.mb-3 Типы событий
       p.text-secondary[role="status" data-event-types-target="status"] Загрузка типов событий…
+      = link_to "Создать тип события", admin_path, class: "btn btn-outline-primary mb-3 d-none", data: { event_types_target: "create" }
       button.btn.btn-outline-primary.mb-3.d-none[type="button" data-event-types-target="retry" data-action="event-types#load"] Повторить
       .row.g-3[data-event-types-target="list"]
       = link_to "На главную", root_path, class: "d-inline-block mt-4"

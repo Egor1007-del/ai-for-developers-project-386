@@ -14,7 +14,7 @@ class JavascriptTest < ApplicationSystemTestCase
     assert_selector "[data-controller='hello']", text: "Hello World!"
 
     click_link "Админка"
-    assert_selector "h1", text: "Админка скоро появится"
+    assert_selector "h1", text: "Новый тип события"
     assert_equal "yes", page.evaluate_script("sessionStorage.getItem('turbo-loaded')")
   end
 end

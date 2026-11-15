@@ -15,7 +15,7 @@ class SmokeTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "placeholder pages are accessible from navigation" do
+  test "booking and admin pages are accessible from navigation" do
     get booking_path
     assert_response :success
     assert_select "h1", "Boss"
@@ -23,7 +23,7 @@ class SmokeTest < ActionDispatch::IntegrationTest
 
     get admin_path
     assert_response :success
-    assert_select "h1", "Админка скоро появится"
+    assert_select "h1", "Новый тип события"
     assert_select "a[href=?]", root_path, text: "На главную"
   end
 end

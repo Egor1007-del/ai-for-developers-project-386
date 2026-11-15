@@ -3,10 +3,11 @@ import { DefaultService } from "../generated"
 import type { EventType } from "../generated"
 
 export default class extends Controller {
-  static targets = ["status", "list", "retry"]
+  static targets = ["status", "list", "retry", "create"]
   declare readonly statusTarget: HTMLElement
   declare readonly listTarget: HTMLElement
   declare readonly retryTarget: HTMLButtonElement
+  declare readonly createTarget: HTMLAnchorElement
 
   connect() {
     this.load()
@@ -15,10 +16,12 @@ export default class extends Controller {
   async load() {
     this.statusTarget.textContent = "Загрузка типов событий…"
     this.retryTarget.classList.add("d-none")
+    this.createTarget.classList.add("d-none")
     this.listTarget.replaceChildren()
     try {
       const { data } = await DefaultService.listEventTypes()
       this.statusTarget.textContent = data.length ? "" : "Пока нет доступных типов событий"
+      this.createTarget.classList.toggle("d-none", data.length !== 0)
       data.forEach((eventType) => this.renderEventType(eventType))
     } catch {
       this.statusTarget.textContent = "Не удалось загрузить типы событий. Попробуйте ещё раз."

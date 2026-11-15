@@ -21,6 +21,29 @@ class EventTypesSystemTest < ApplicationSystemTestCase
   test "guest sees an empty state" do
     visit booking_path
     assert_text "Пока нет доступных типов событий"
+    click_link "Создать тип события"
+    assert_text "Новый тип события"
+  end
+
+  test "owner creates an event type which the guest can see" do
+    visit admin_path
+    fill_in "Название", with: "Консультация"
+    fill_in "Описание", with: "Разговор о проекте"
+    select "30 минут", from: "Длительность"
+    click_button "Создать тип события"
+    assert_current_path booking_path
+    assert_text "Консультация"
+    assert_text "Разговор о проекте"
+    assert_text "30 минут"
+  end
+
+  test "owner sees validation errors by the fields" do
+    visit admin_path
+    fill_in "Название", with: "   "
+    fill_in "Описание", with: "   "
+    click_button "Создать тип события"
+    assert_selector "#name-error", text: /.+/
+    assert_selector "#description-error", text: /.+/
   end
 
   test "guest can retry after a loading error" do
