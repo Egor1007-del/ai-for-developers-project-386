@@ -1,0 +1,23 @@
+main.container.py-5
+  .row.justify-content-center
+    .col-lg-8
+      h1.h2.fw-bold.mb-4 Новый тип события
+      form.card.border-0.shadow-sm.rounded-4[data-controller="event-type-form" data-action="submit->event-type-form#submit" data-success-url=booking_path novalidate]
+        .card-body.p-4
+          .mb-3
+            label.form-label[for="name"] Название
+            input.form-control#name[name="name" maxlength="100" data-event-type-form-target="name" aria-describedby="name-error"]
+            .text-danger.small#name-error[data-event-type-form-target="nameError"]
+          .mb-3
+            label.form-label[for="description"] Описание
+            textarea.form-control#description[name="description" maxlength="1000" rows="4" data-event-type-form-target="description" aria-describedby="description-error"]
+            .text-danger.small#description-error[data-event-type-form-target="descriptionError"]
+          .mb-3
+            label.form-label[for="duration_minutes"] Длительность
+            select.form-select#duration_minutes[name="duration_minutes" data-event-type-form-target="duration" aria-describedby="duration-error"]
+              option[value="15"] 15 минут
+              option[value="30"] 30 минут
+            .text-danger.small#duration-error[data-event-type-form-target="durationError"]
+          p[role="status" data-event-type-form-target="status"]
+          button.btn.btn-primary[type="submit" data-event-type-form-target="submit"] Создать тип события
+      = link_to "В админку", admin_path, class: "d-inline-block mt-4"

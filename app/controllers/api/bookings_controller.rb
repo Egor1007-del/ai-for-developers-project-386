@@ -2,6 +2,15 @@ class Api::BookingsController < Api::BaseController
   rescue_from StandardError, with: :handle_error
   rescue_from ActionDispatch::Http::Parameters::ParseError, ActionController::BadRequest, with: :invalid_json
 
+  def upcoming
+    bookings = Booking.includes(:event_type).where("starts_at > ?", Time.current).order(:starts_at)
+    render json: { data: bookings.map { |booking|
+      { id: booking.id, event_type: booking.event_type.as_json(only: %i[id name description duration_minutes]),
+        starts_at: booking.starts_at.in_time_zone(Availability::ZONE).iso8601,
+        ends_at: booking.ends_at.in_time_zone(Availability::ZONE).iso8601 }
+    } }
+  end
+
   def create
     input = request.request_parameters
     unless input["event_type_id"].is_a?(Integer) && input["event_type_id"].positive? && input["starts_at"].is_a?(String) && input["starts_at"].present?
@@ -40,7 +49,8 @@ class Api::BookingsController < Api::BaseController
       service_unavailable
     else
       Rails.logger.error("Booking failed: #{exception.full_message}")
-      error("internal_error", "Не удалось создать запись", :internal_server_error)
+      message = action_name == "upcoming" ? "Не удалось загрузить предстоящие записи" : "Не удалось создать запись"
+      error("internal_error", message, :internal_server_error)
     end
   end
 end

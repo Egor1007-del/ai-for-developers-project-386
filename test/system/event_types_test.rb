@@ -27,6 +27,8 @@ class EventTypesSystemTest < ApplicationSystemTestCase
 
   test "owner creates an event type which the guest can see" do
     visit admin_path
+    click_link "Создать тип события"
+    assert_current_path new_admin_event_type_path
     fill_in "Название", with: "Консультация"
     fill_in "Описание", with: "Разговор о проекте"
     select "30 минут", from: "Длительность"
@@ -38,7 +40,7 @@ class EventTypesSystemTest < ApplicationSystemTestCase
   end
 
   test "owner sees validation errors by the fields" do
-    visit admin_path
+    visit new_admin_event_type_path
     fill_in "Название", with: "   "
     fill_in "Описание", with: "   "
     click_button "Создать тип события"

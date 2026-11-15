@@ -3,13 +3,16 @@ Rails.application.routes.draw do
     resources :event_types, only: %i[index create] do
       get :availability, on: :member
     end
-    resources :bookings, only: :create
+    resources :bookings, only: :create do
+      get :upcoming, on: :collection
+    end
   end
 
   scope module: :web do
     root "home#index"
     get "booking", to: "pages#booking"
     get "admin", to: "pages#admin"
+    get "admin/event_types/new", to: "pages#new_event_type", as: :new_admin_event_type
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

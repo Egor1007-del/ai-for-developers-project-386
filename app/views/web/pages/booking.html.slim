@@ -5,7 +5,7 @@ main.container.py-5.booking-page[data-controller="event-types"]
       p.text-secondary Выберите тип звонка, чтобы записаться на встречу.
       h2.h4.fw-bold.mb-3 Типы событий
       p.text-secondary[role="status" data-event-types-target="status"] Загрузка типов событий…
-      = link_to "Создать тип события", admin_path, class: "btn btn-outline-primary mb-3 d-none", data: { event_types_target: "create" }
+      = link_to "Создать тип события", new_admin_event_type_path, class: "btn btn-outline-primary mb-3 d-none", data: { event_types_target: "create" }
       button.btn.btn-outline-primary.mb-3.d-none[type="button" data-event-types-target="retry" data-action="event-types#load"] Повторить
       .row.g-3[data-event-types-target="list"]
     section.d-none[data-event-types-target="booking"]

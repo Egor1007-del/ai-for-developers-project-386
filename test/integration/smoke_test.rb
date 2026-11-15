@@ -23,7 +23,13 @@ class SmokeTest < ActionDispatch::IntegrationTest
 
     get admin_path
     assert_response :success
-    assert_select "h1", "Новый тип события"
+    assert_select "h1", "Админка"
+    assert_select "a[href=?]", new_admin_event_type_path, text: "Создать тип события"
     assert_select "a[href=?]", root_path, text: "На главную"
+
+    get new_admin_event_type_path
+    assert_response :success
+    assert_select "h1", "Новый тип события"
+    assert_select "a[href=?]", admin_path, text: "В админку"
   end
 end

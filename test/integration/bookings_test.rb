@@ -1,6 +1,29 @@
 require "test_helper"
 
 class BookingsTest < ActionDispatch::IntegrationTest
+  test "upcoming bookings returns an empty data array" do
+    get "/api/bookings/upcoming"
+    assert_response :success
+    assert_equal({ "data" => [] }, response.parsed_body)
+  end
+
+  test "upcoming bookings include all event types in start order and exclude started bookings" do
+    short = EventType.create!(name: "Короткий", description: "Первый", duration_minutes: 15)
+    long = EventType.create!(name: "Длинный", description: "Второй", duration_minutes: 30)
+    travel_to Time.utc(2026, 11, 15, 6) do
+      Booking.create!(event_type: short, starts_at: Time.utc(2026, 11, 15, 5, 30), ends_at: Time.utc(2026, 11, 15, 5, 45))
+      Booking.create!(event_type: short, starts_at: Time.current, ends_at: 15.minutes.from_now)
+      later = Booking.create!(event_type: long, starts_at: 2.hours.from_now, ends_at: 2.hours.from_now + 30.minutes)
+      earlier = Booking.create!(event_type: short, starts_at: 1.hour.from_now, ends_at: 1.hour.from_now + 15.minutes)
+
+      get "/api/bookings/upcoming"
+      assert_response :success
+      assert_equal [
+        { "id" => earlier.id, "event_type" => { "id" => short.id, "name" => "Короткий", "description" => "Первый", "duration_minutes" => 15 }, "starts_at" => "2026-11-15T10:00:00+03:00", "ends_at" => "2026-11-15T10:15:00+03:00" },
+        { "id" => later.id, "event_type" => { "id" => long.id, "name" => "Длинный", "description" => "Второй", "duration_minutes" => 30 }, "starts_at" => "2026-11-15T11:00:00+03:00", "ends_at" => "2026-11-15T11:30:00+03:00" }
+      ], response.parsed_body.fetch("data")
+    end
+  end
   test "availability reports SQLite busy and locked errors as service unavailable" do
     event_type = EventType.create!(name: "Звонок", description: "Описание", duration_minutes: 15)
     [ SQLite3::BusyException, SQLite3::LockedException ].each do |exception_class|
