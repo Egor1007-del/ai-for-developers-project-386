@@ -1,0 +1,321 @@
+openapi: 3.0.0
+info:
+  title: Calendar API
+  version: 0.0.0
+tags: []
+paths:
+  /api/bookings:
+    post:
+      operationId: createBooking
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: 'invalid_json: malformed JSON request body'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: 'event_type_not_found: the event type does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: 'booking_conflict: the requested slot overlaps another booking'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: validation_error for invalid or missing fields; invalid_start_time for a time outside the booking rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: 'internal_error: unexpected server error without technical details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '503':
+          description: 'service_unavailable: database lock wait exhausted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingInput'
+  /api/bookings/upcoming:
+    get:
+      operationId: listUpcomingBookings
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Booking'
+                required:
+                  - data
+        '500':
+          description: 'internal_error: unexpected server error without technical details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/event_types:
+    get:
+      operationId: listEventTypes
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventType'
+                required:
+                  - data
+        '500':
+          description: 'internal_error: unexpected server error without technical details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      operationId: createEventType
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '400':
+          description: 'invalid_json: malformed JSON request body'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: validation_error for invalid or missing fields; invalid_start_time for a time outside the booking rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: 'internal_error: unexpected server error without technical details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventTypeInput'
+  /api/event_types/{id}/availability:
+    get:
+      operationId: getAvailability
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Availability'
+        '404':
+          description: 'event_type_not_found: the event type does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: validation_error for invalid or missing fields; invalid_start_time for a time outside the booking rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '500':
+          description: 'internal_error: unexpected server error without technical details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+components:
+  schemas:
+    Availability:
+      type: object
+      required:
+        - time_zone
+        - days
+      properties:
+        time_zone:
+          type: string
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/Day'
+    Booking:
+      type: object
+      required:
+        - id
+        - event_type
+        - starts_at
+        - ends_at
+      properties:
+        id:
+          type: integer
+          format: int32
+        event_type:
+          $ref: '#/components/schemas/EventType'
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+    BookingInput:
+      type: object
+      required:
+        - event_type_id
+        - starts_at
+      properties:
+        event_type_id:
+          type: integer
+          format: int32
+        starts_at:
+          type: string
+          format: date-time
+    Day:
+      type: object
+      required:
+        - date
+        - slots
+      properties:
+        date:
+          type: string
+          format: date
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slot'
+    ErrorBody:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetails'
+    ErrorDetails:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - invalid_json
+            - event_type_not_found
+            - validation_error
+            - invalid_start_time
+            - booking_conflict
+            - service_unavailable
+            - internal_error
+        message:
+          type: string
+        fields:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    EventType:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - duration_minutes
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        duration_minutes:
+          type: number
+          enum:
+            - 15
+            - 30
+    EventTypeInput:
+      type: object
+      required:
+        - name
+        - description
+        - duration_minutes
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        duration_minutes:
+          type: number
+          enum:
+            - 15
+            - 30
+    Slot:
+      type: object
+      required:
+        - starts_at
+        - ends_at
+      properties:
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time

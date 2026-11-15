@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  namespace :api do
+    resources :event_types, only: :index
+  end
+
   scope module: :web do
     root "home#index"
     get "booking", to: "pages#booking"

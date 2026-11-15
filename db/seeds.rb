@@ -1,9 +1,8 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+[
+  { name: "Знакомство", description: "Короткий звонок для знакомства", duration_minutes: 15 },
+  { name: "Обсуждение", description: "Встреча для подробного обсуждения", duration_minutes: 30 }
+].each do |attributes|
+  EventType.find_or_create_by!(name: attributes[:name]) do |event_type|
+    event_type.assign_attributes(attributes)
+  end
+end

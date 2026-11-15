@@ -4,6 +4,7 @@ CI.run do
   step "Setup", "bin/setup --skip-server"
 
   step "Style: Ruby", "bin/rubocop"
+  step "API: Generate OpenAPI and SDK", "yarn generate:api"
   step "Types: TypeScript", "yarn typecheck"
 
   step "Security: Gem audit", "bin/bundler-audit"

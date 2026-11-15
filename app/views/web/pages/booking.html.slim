@@ -1,3 +1,13 @@
-main.container.py-5
-  h1 Страница записи скоро появится
-  = link_to "На главную", root_path
+main.container.py-5[data-controller="event-types"]
+  .row.justify-content-center
+    .col-lg-8
+      .card.border-0.shadow-sm.rounded-4.mb-4
+        .card-body.p-4
+          span.badge.text-bg-primary.mb-3 Календарь владельца
+          h1.h2.fw-bold Boss
+          p.text-secondary.mb-0 Выберите тип звонка, чтобы записаться на встречу.
+      h2.h4.fw-bold.mb-3 Типы событий
+      p.text-secondary[role="status" data-event-types-target="status"] Загрузка типов событий…
+      button.btn.btn-outline-primary.mb-3.d-none[type="button" data-event-types-target="retry" data-action="event-types#load"] Повторить
+      .row.g-3[data-event-types-target="list"]
+      = link_to "На главную", root_path, class: "d-inline-block mt-4"

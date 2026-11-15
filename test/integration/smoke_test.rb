@@ -18,7 +18,7 @@ class SmokeTest < ActionDispatch::IntegrationTest
   test "placeholder pages are accessible from navigation" do
     get booking_path
     assert_response :success
-    assert_select "h1", "Страница записи скоро появится"
+    assert_select "h1", "Boss"
     assert_select "a[href=?]", root_path, text: "На главную"
 
     get admin_path

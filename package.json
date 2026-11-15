@@ -16,6 +16,7 @@
     "typescript": "^7.0.2"
   },
   "scripts": {
+    "generate:api": "tsp compile api/main.tsp --config tspconfig.yaml && openapi --input api/openapi.yaml --output app/javascript/generated --client fetch",
     "build": "esbuild app/javascript/application.js --bundle --sourcemap --format=esm --outdir=app/assets/builds",
     "watch:js": "yarn build --watch=forever",
     "typecheck": "tsc --noEmit",
@@ -26,5 +27,12 @@
   },
   "browserslist": [
     "defaults"
-  ]
+  ],
+  "devDependencies": {
+    "@typespec/compiler": "^1.18.0",
+    "@typespec/http": "^1.18.0",
+    "@typespec/openapi": "^1.18.0",
+    "@typespec/openapi3": "^1.18.0",
+    "openapi-typescript-codegen": "^0.31.0"
+  }
 }
