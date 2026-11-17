@@ -7,3 +7,5 @@ Release Please отслеживает Conventional Commits в `main` и созд
 Если настройки репозитория ограничивают создание pull request через Actions, разрешите его в **Settings → Actions → General → Workflow permissions**. После добавления секрета запустите **Release Please** вручную через вкладку Actions либо дождитесь следующего push в `main`.
 
 Коммиты `feat:` повышают minor-версию, `fix:` — patch-версию, а breaking changes — major-версию. Перед слиянием release PR проверьте предложенные версию и changelog.
+
+Описания коммитов пишите на русском языке: release-please использует их в changelog без перевода.
