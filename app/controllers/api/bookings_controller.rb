@@ -45,7 +45,7 @@ class Api::BookingsController < Api::BaseController
     end
     if causes.any? { |item| booking_conflict?(item) }
       error("booking_conflict", "Это время уже занято. Выберите другой слот.", :conflict)
-    elsif database_busy?(exception)
+    elsif database_unavailable?(exception)
       service_unavailable
     else
       Rails.logger.error("Booking failed: #{exception.full_message}")

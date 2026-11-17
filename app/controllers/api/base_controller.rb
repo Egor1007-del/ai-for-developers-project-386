@@ -12,7 +12,7 @@ class Api::BaseController < ApplicationController
     error("invalid_json", "Некорректный JSON", :bad_request)
   end
 
-  def database_busy?(exception)
+  def database_unavailable?(exception)
     while exception
       return true if exception.is_a?(SQLite3::BusyException) || exception.is_a?(SQLite3::LockedException) ||
         exception.is_a?(ActiveRecord::ConnectionNotEstablished) || exception.is_a?(PG::ConnectionBad) ||

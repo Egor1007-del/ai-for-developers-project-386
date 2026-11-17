@@ -13,6 +13,47 @@ class BookingConcurrencyTest < ActiveSupport::TestCase
     EventType.delete_all
   end
 
+  test "an uncommitted overlapping write makes the booking API unavailable until it can report a conflict" do
+    type = EventType.create!(name: "Звонок", description: "Описание", duration_minutes: 30)
+    result = Queue.new
+    travel_to Time.utc(2026, 11, 15, 6) do
+      Booking.transaction do
+        Booking.create!(event_type: type, starts_at: Time.utc(2026, 11, 15, 7), ends_at: Time.utc(2026, 11, 15, 7, 30))
+        thread = Thread.new do
+          ActiveRecord::Base.connection_pool.with_connection do |connection|
+            if connection.adapter_name == "PostgreSQL"
+              connection.execute("SET lock_timeout = '250ms'")
+            else
+              connection.raw_connection.busy_timeout(250)
+            end
+            session = ActionDispatch::Integration::Session.new(Rails.application)
+            session.post "/api/bookings", params: { event_type_id: type.id, starts_at: "2026-11-15T10:00:00+03:00" }, as: :json
+            result << [ session.response.status, session.response.parsed_body ]
+          ensure
+            if connection.adapter_name == "PostgreSQL"
+              connection.execute("RESET lock_timeout")
+            else
+              connection.raw_connection.busy_timeout(5000)
+            end
+          end
+        end
+        assert thread.join(10), "booking request did not finish while the conflicting transaction was open"
+        status, body = result.pop
+        assert_equal 503, status
+        assert_equal "service_unavailable", body.dig("error", "code")
+      ensure
+        thread&.kill
+        thread&.join
+      end
+
+      session = ActionDispatch::Integration::Session.new(Rails.application)
+      session.post "/api/bookings", params: { event_type_id: type.id, starts_at: "2026-11-15T10:00:00+03:00" }, as: :json
+      assert_equal 409, session.response.status
+      assert_equal "booking_conflict", session.response.parsed_body.dig("error", "code")
+      assert_equal 1, Booking.count
+    end
+  end
+
   test "simultaneous requests for the same slot return one conflict" do
     types = [ 15, 30 ].map do |duration|
       EventType.create!(name: "Звонок", description: "Описание", duration_minutes: duration)
