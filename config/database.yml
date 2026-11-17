@@ -19,22 +19,14 @@ development:
 test:
   <<: *default
   database: storage/test.sqlite3
+  <% if ENV['TEST_DATABASE_URL'].present? %>
+  url: <%= ENV['TEST_DATABASE_URL'] %>
+  <% end %>
+  schema_dump: <%= (ENV['TEST_DATABASE_URL'].presence || ENV['DATABASE_URL']).to_s.match?(/\Apostgres(?:ql)?:/) ? 'structure.postgresql.sql' : 'structure.sql' %>
 
-# Store production database in the storage/ directory, which by default
-# is mounted as a persistent Docker volume in config/deploy.yml.
+# Production uses a single PostgreSQL database supplied by the environment.
 production:
-  primary:
-    <<: *default
-    database: storage/production.sqlite3
-  cache:
-    <<: *default
-    database: storage/production_cache.sqlite3
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *default
-    database: storage/production_queue.sqlite3
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *default
-    database: storage/production_cable.sqlite3
-    migrations_paths: db/cable_migrate
+  adapter: postgresql
+  url: <%= ENV['DATABASE_URL'] %>
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+  schema_dump: structure.postgresql.sql

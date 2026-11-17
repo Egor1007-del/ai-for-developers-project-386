@@ -37,7 +37,7 @@ class Api::EventTypesController < Api::BaseController
 
     render json: { time_zone: "Europe/Moscow", days: Availability.new(event_type).days }
   rescue StandardError => error
-    raise unless database_busy?(error)
+    raise unless database_unavailable?(error)
 
     service_unavailable
   end

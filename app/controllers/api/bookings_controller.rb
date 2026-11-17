@@ -43,14 +43,21 @@ class Api::BookingsController < Api::BaseController
       causes << cause
       cause = cause.cause
     end
-    if causes.any? { |item| item.message.include?("booking_conflict") }
+    if causes.any? { |item| booking_conflict?(item) }
       error("booking_conflict", "Это время уже занято. Выберите другой слот.", :conflict)
-    elsif database_busy?(exception)
+    elsif database_unavailable?(exception)
       service_unavailable
     else
       Rails.logger.error("Booking failed: #{exception.full_message}")
       message = action_name == "upcoming" ? "Не удалось загрузить предстоящие записи" : "Не удалось создать запись"
       error("internal_error", message, :internal_server_error)
     end
+  end
+
+  def booking_conflict?(exception)
+    return true if exception.is_a?(SQLite3::ConstraintException) && exception.message == "booking_conflict"
+
+    exception.is_a?(PG::ExclusionViolation) &&
+      exception.result&.error_field(PG::Result::PG_DIAG_CONSTRAINT_NAME) == "booking_no_overlap"
   end
 end

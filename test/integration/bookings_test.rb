@@ -1,6 +1,48 @@
 require "test_helper"
 
 class BookingsTest < ActionDispatch::IntegrationTest
+  test "connection pool timeouts are reported as unavailable by booking and availability APIs" do
+    event_type = EventType.create!(name: "Звонок", description: "Описание", duration_minutes: 15)
+    original = Availability.method(:new)
+    Availability.define_singleton_method(:new) { |*| raise ActiveRecord::ConnectionTimeoutError, "pool timeout" }
+    travel_to Time.utc(2026, 11, 15, 6) do
+      post "/api/bookings", params: { event_type_id: event_type.id, starts_at: "2026-11-15T10:00:00+03:00" }, as: :json
+      assert_response :service_unavailable
+      assert_equal "service_unavailable", response.parsed_body.dig("error", "code")
+      get "/api/event_types/#{event_type.id}/availability"
+      assert_response :service_unavailable
+      assert_equal "service_unavailable", response.parsed_body.dig("error", "code")
+    end
+  ensure
+    Availability.define_singleton_method(:new, original) if original
+  end
+
+  test "database connection errors are reported as unavailable" do
+    event_type = EventType.create!(name: "Звонок", description: "Описание", duration_minutes: 15)
+    original = Availability.method(:new)
+    Availability.define_singleton_method(:new) { |*| raise PG::ConnectionBad, "booking_conflict connection failed" }
+    travel_to Time.utc(2026, 11, 15, 6) do
+      post "/api/bookings", params: { event_type_id: event_type.id, starts_at: "2026-11-15T10:00:00+03:00" }, as: :json
+      assert_response :service_unavailable
+      assert_equal "service_unavailable", response.parsed_body.dig("error", "code")
+    end
+  ensure
+    Availability.define_singleton_method(:new, original) if original
+  end
+
+  test "unrelated database errors mentioning booking_conflict are not conflicts" do
+    event_type = EventType.create!(name: "Звонок", description: "Описание", duration_minutes: 15)
+    original = Availability.method(:new)
+    Availability.define_singleton_method(:new) { |*| raise ActiveRecord::StatementInvalid, "booking_conflict database unavailable" }
+    travel_to Time.utc(2026, 11, 15, 6) do
+      post "/api/bookings", params: { event_type_id: event_type.id, starts_at: "2026-11-15T10:00:00+03:00" }, as: :json
+      assert_response :internal_server_error
+      assert_equal "internal_error", response.parsed_body.dig("error", "code")
+    end
+  ensure
+    Availability.define_singleton_method(:new, original) if original
+  end
+
   test "upcoming bookings returns an empty data array" do
     get "/api/bookings/upcoming"
     assert_response :success
