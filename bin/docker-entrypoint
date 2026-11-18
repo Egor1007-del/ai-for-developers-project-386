@@ -2,6 +2,15 @@
 
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  unset AUTONOMOUS_DATABASE
+  if [ -z "${DATABASE_URL:-}" ] && [ -z "${SECRET_KEY_BASE:-}" ]; then
+    export AUTONOMOUS_DATABASE=1
+    export SECRET_KEY_BASE="$(ruby -rsecurerandom -e 'print SecureRandom.hex(64)')"
+    echo "Starting with temporary SQLite database and generated secret"
+  elif [ -z "${DATABASE_URL:-}" ] || [ -z "${SECRET_KEY_BASE:-}" ]; then
+    echo "DATABASE_URL and SECRET_KEY_BASE must both be set for production" >&2
+    exit 1
+  fi
   ./bin/rails db:prepare
   ./bin/rails db:seed
 fi

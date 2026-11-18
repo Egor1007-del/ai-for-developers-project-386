@@ -24,9 +24,16 @@ test:
   <% end %>
   schema_dump: <%= (ENV['TEST_DATABASE_URL'].presence || ENV['DATABASE_URL']).to_s.match?(/\Apostgres(?:ql)?:/) ? 'structure.postgresql.sql' : 'structure.sql' %>
 
-# Production uses a single PostgreSQL database supplied by the environment.
+# The container can also start with a temporary SQLite database for checks.
 production:
+  <% if ENV['AUTONOMOUS_DATABASE'] == '1' %>
+  adapter: sqlite3
+  database: /tmp/calendar-autonomous.sqlite3
+  timeout: 5000
+  schema_dump: structure.sql
+  <% else %>
   adapter: postgresql
   url: <%= ENV['DATABASE_URL'] %>
-  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
   schema_dump: structure.postgresql.sql
+  <% end %>
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>

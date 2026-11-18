@@ -66,6 +66,25 @@ jobs:
       - uses: actions/checkout@v6
       - name: Build production image
         run: docker build -t calendar-ci .
+      - name: Verify autonomous startup
+        run: |
+          set -euo pipefail
+          cleanup() {
+            docker logs calendar-ci-autonomous || true
+            docker rm -f calendar-ci-autonomous || true
+          }
+          trap cleanup EXIT
+          docker run -d --name calendar-ci-autonomous -p 8080:8080 -e PORT=8080 calendar-ci
+          for attempt in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:8080/ > /dev/null; then
+              exit 0
+            fi
+            if [ "$(docker inspect -f '{{.State.Running}}' calendar-ci-autonomous)" != true ]; then
+              exit 1
+            fi
+            sleep 2
+          done
+          exit 1
       - name: Verify startup, database preparation and persistence
         run: |
           set -euo pipefail
