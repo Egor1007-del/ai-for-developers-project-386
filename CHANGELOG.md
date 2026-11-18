@@ -1,5 +1,16 @@
 # Список изменений
 
+## [0.3.0](https://github.com/Egor1007-del/ai-for-developers-project-386/compare/v0.2.0...v0.3.0) (2026-11-18)
+
+
+### Новые возможности
+
+* настроить безопасное подключение Render MCP ([#32](https://github.com/Egor1007-del/ai-for-developers-project-386/issues/32)) ([ab2a19b](https://github.com/Egor1007-del/ai-for-developers-project-386/commit/ab2a19bd49a68cfb4c90f15e340a1e67eca3cec7))
+* настроить безопасное подключение Render MCP ([#32](https://github.com/Egor1007-del/ai-for-developers-project-386/issues/32)) ([6e55c5d](https://github.com/Egor1007-del/ai-for-developers-project-386/commit/6e55c5dc78c87d57e2c4b74f60e7c1ac9d7ed62f))
+* подготовить CI и конфигурацию Render ([#33](https://github.com/Egor1007-del/ai-for-developers-project-386/issues/33)) ([32ef4cf](https://github.com/Egor1007-del/ai-for-developers-project-386/commit/32ef4cf3a6c572af944d74c9657ec1cbd9d7f3b7))
+* подготовить CI и конфигурацию Render ([#33](https://github.com/Egor1007-del/ai-for-developers-project-386/issues/33)) ([fee037e](https://github.com/Egor1007-del/ai-for-developers-project-386/commit/fee037e21107d4ab816752d5da89fe58fa3b88b4))
+* подготовить production Docker-образ ([#31](https://github.com/Egor1007-del/ai-for-developers-project-386/issues/31)) ([3c3701f](https://github.com/Egor1007-del/ai-for-developers-project-386/commit/3c3701f303721d5f9ccac60e57b12f93efc4e82f))
+
 ## [0.2.0](https://github.com/Egor1007-del/ai-for-developers-project-386/compare/v0.1.0...v0.2.0) (2026-11-17)
 
 
