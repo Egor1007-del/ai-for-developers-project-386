@@ -1,5 +1,17 @@
 # Список изменений
 
+## [0.2.0](https://github.com/Egor1007-del/ai-for-developers-project-386/compare/v0.1.0...v0.2.0) (2026-11-17)
+
+
+### Новые возможности
+
+* поддержать PostgreSQL для бронирований ([#30](https://github.com/Egor1007-del/ai-for-developers-project-386/issues/30)) ([e6660a4](https://github.com/Egor1007-del/ai-for-developers-project-386/commit/e6660a4e67a24acdb186822aca5b7e568d6fe8eb))
+
+
+### Исправления
+
+* уточнить обработку недоступности базы данных ([#30](https://github.com/Egor1007-del/ai-for-developers-project-386/issues/30)) ([32422ee](https://github.com/Egor1007-del/ai-for-developers-project-386/commit/32422ee44f6e8282fda8556600951b569c417ca3))
+
 ## 0.1.0 (2026-11-17)
 
 
