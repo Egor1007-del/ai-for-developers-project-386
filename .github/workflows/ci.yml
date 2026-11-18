@@ -6,6 +6,7 @@ on:
 
 jobs:
   check:
+    name: SQLite checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -14,3 +15,99 @@ jobs:
         run: bundle install
       - name: Run checks
         run: mise run check
+
+  postgres:
+    name: PostgreSQL checks
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: calendar_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d calendar_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/calendar_test
+    steps:
+      - uses: actions/checkout@v6
+      - uses: jdx/mise-action@v3
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Install Ruby dependencies
+        run: bundle install
+      - name: Run checks
+        run: mise run check
+
+  docker:
+    name: Production Docker
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: calendar_production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d calendar_production"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build production image
+        run: docker build -t calendar-ci .
+      - name: Verify startup, database preparation and persistence
+        run: |
+          set -euo pipefail
+          cleanup() {
+            docker logs calendar-ci-app || true
+            docker rm -f calendar-ci-app || true
+          }
+          trap cleanup EXIT
+          start_app() {
+            docker run -d --name calendar-ci-app --network host \
+              -e DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/calendar_production \
+              -e SECRET_KEY_BASE=ci-only-secret-key-base-not-for-production \
+              -e PORT=4321 calendar-ci
+            for attempt in {1..60}; do
+              if curl --fail --silent http://127.0.0.1:4321/up > /dev/null; then
+                return 0
+              fi
+              if [ "$(docker inspect -f '{{.State.Running}}' calendar-ci-app)" != true ]; then
+                return 1
+              fi
+              sleep 2
+            done
+            return 1
+          }
+          start_app
+          curl --fail --silent -c /tmp/calendar-cookies http://127.0.0.1:4321/ > /tmp/calendar-home.html
+          csrf_token=$(python3 -c 'import re; print(re.search(r"<meta name=\"csrf-token\" content=\"([^\"]+)\"", open("/tmp/calendar-home.html").read()).group(1))')
+          curl --fail --silent -X POST http://127.0.0.1:4321/api/event_types \
+            -b /tmp/calendar-cookies -H "X-CSRF-Token: $csrf_token" \
+            -H 'Content-Type: application/json' \
+            -d '{"name":"CI persistence","description":"Survives restart","duration_minutes":15}' > /tmp/calendar-created.json
+          docker rm -f calendar-ci-app
+          start_app
+          curl --fail --silent http://127.0.0.1:4321/api/event_types > /tmp/calendar-event-types.json
+          python3 - <<'PY'
+          import json
+
+          with open('/tmp/calendar-created.json') as f:
+              created = json.load(f)
+          with open('/tmp/calendar-event-types.json') as f:
+              event_types = json.load(f)['data']
+          assert created in event_types, 'Created event type did not survive container restart'
+          for name, duration in [('Знакомство', 15), ('Обсуждение', 30)]:
+              assert sum(e['name'] == name and e['duration_minutes'] == duration for e in event_types) == 1, name
+          PY
