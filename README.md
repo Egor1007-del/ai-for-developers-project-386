@@ -18,7 +18,7 @@
 
 ## Стек
 
-- Ruby 4.0.6, Rails 8.1.4.1, SQLite
+- Ruby 4.0.6, Rails 8.1.4.1, SQLite для разработки и PostgreSQL для production
 - Slim, Bootstrap, Hotwire (Turbo и Stimulus), esbuild
 - Node.js и Yarn для сборки JavaScript, TypeScript и стилей
 
@@ -43,6 +43,20 @@ mise run dev
 Откройте http://localhost:3000. Пока доступен только каркас приложения.
 
 Проверка состояния приложения: http://localhost:3000/up.
+
+### Production Docker
+
+Для запуска нужна доступная PostgreSQL-база и секретный `SECRET_KEY_BASE` (например, результат `mise exec -- bin/rails secret`). Передайте строку подключения через `DATABASE_URL`. Если PostgreSQL работает в отдельном контейнере, подключите оба контейнера к одной Docker-сети (например, созданной командой `docker network create calendar-network`) и укажите имя контейнера PostgreSQL как хост в `DATABASE_URL`, а не `localhost`. В примере ниже PostgreSQL уже подключён к сети `calendar-network`.
+
+```bash
+docker build -t calendar-calls .
+docker run --rm --network calendar-network -p 3000:3000 \
+  -e DATABASE_URL="$DATABASE_URL" \
+  -e SECRET_KEY_BASE="$SECRET_KEY_BASE" \
+  -e PORT=3000 calendar-calls
+```
+
+Контейнер слушает `0.0.0.0` на порту `PORT` (по умолчанию 3000). При старте выполняются подготовка базы и seeds: недостающие начальные типы событий создаются по названию и длительности, существующие записи не перезаписываются. Данные сохраняются между перезапусками, пока сохраняется сама база PostgreSQL.
 
 ### Фоновый запуск через mise daemons
 

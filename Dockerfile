@@ -1,14 +1,15 @@
 # syntax=docker/dockerfile:1
 # check=error=true
 
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t calendar_calls .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name calendar_calls calendar_calls
+# This Dockerfile is designed for production, not development. See README for
+# the required PostgreSQL connection and local run instructions.
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=4.0.6
+ARG NODE_VERSION=24.16.0
+FROM docker.io/library/node:$NODE_VERSION-slim AS node
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -29,6 +30,11 @@ ENV RAILS_ENV="production" \
 
 # Throw-away build stage to reduce size of final image
 FROM base AS build
+
+# Asset compilation uses the same Node and Yarn versions as local development.
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /opt/yarn-v1.22.22 /opt/yarn-v1.22.22
+RUN ln -s /opt/yarn-v1.22.22/bin/yarn /usr/local/bin/yarn
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
@@ -72,6 +78,6 @@ COPY --chown=rails:rails --from=build /rails /rails
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start server via Thruster by default, this can be overwritten at runtime
-EXPOSE 80
-CMD ["./bin/thrust", "./bin/rails", "server"]
+# Puma listens on PORT (3000 by default).
+EXPOSE 3000
+CMD ["./bin/rails", "server"]
