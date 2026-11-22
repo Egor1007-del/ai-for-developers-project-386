@@ -1,0 +1,10 @@
+require "open3"
+
+status, result = Open3.capture2("git", "status", "--porcelain", "--untracked-files=all", "--",
+  "api/openapi.yaml", "app/javascript/generated/")
+abort "Не удалось проверить сгенерированные артефакты API" unless result.success?
+
+unless status.empty?
+  warn status
+  abort "Артефакты API отличаются от сохранённых в Git. Выполните yarn generate:api и сохраните результат."
+end
