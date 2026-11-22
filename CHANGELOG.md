@@ -1,5 +1,13 @@
 # Список изменений
 
+## [0.3.1](https://github.com/Egor1007-del/ai-for-developers-project-386/compare/v0.3.0...v0.3.1) (2026-11-22)
+
+
+### Исправления
+
+* обеспечить автономный запуск Docker ([#29](https://github.com/Egor1007-del/ai-for-developers-project-386/issues/29)) ([5a93a12](https://github.com/Egor1007-del/ai-for-developers-project-386/commit/5a93a122c9e9fd11218fd67c8f59f8c6b5a0b9fc))
+* обновить Ruby и Brakeman для проверок безопасности ([90ad575](https://github.com/Egor1007-del/ai-for-developers-project-386/commit/90ad575ffc530db0ccbd43ef5fccc45e2e638fa3))
+
 ## [0.3.0](https://github.com/Egor1007-del/ai-for-developers-project-386/compare/v0.2.0...v0.3.0) (2026-11-18)
 
 
