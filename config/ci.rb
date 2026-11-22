@@ -5,6 +5,7 @@ CI.run do
 
   step "Style: Ruby", "bin/rubocop"
   step "API: Generate OpenAPI and SDK", "yarn generate:api"
+  step "API: Check generated artifacts", "ruby bin/check-api-generated"
   step "Types: TypeScript", "yarn typecheck"
 
   step "Security: Gem audit", "bin/bundler-audit"
