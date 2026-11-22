@@ -20,7 +20,7 @@
 
 ## Стек
 
-- Ruby 4.0.6, Rails 8.1.4.1, SQLite для разработки и PostgreSQL для production
+- Ruby 4.0.10, Rails 8.1.4.1, SQLite для разработки и PostgreSQL для production
 - Slim, Bootstrap, Hotwire (Turbo и Stimulus), esbuild
 - Node.js и Yarn для сборки JavaScript, TypeScript и стилей
 
