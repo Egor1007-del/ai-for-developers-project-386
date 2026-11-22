@@ -1,5 +1,12 @@
 # Список изменений
 
+## [0.3.2](https://github.com/Egor1007-del/ai-for-developers-project-386/compare/v0.3.1...v0.3.2) (2026-11-22)
+
+
+### Исправления
+
+* проверять актуальность артефактов API в CI ([f95b34c](https://github.com/Egor1007-del/ai-for-developers-project-386/commit/f95b34c1975ca5a860f1617fdae5701465de3b23))
+
 ## [0.3.1](https://github.com/Egor1007-del/ai-for-developers-project-386/compare/v0.3.0...v0.3.1) (2026-11-22)
 
 
